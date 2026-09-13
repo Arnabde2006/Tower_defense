@@ -410,21 +410,21 @@ html, body {
   width: 290px;
   background: var(--bg-panel);
   border-left: 1px solid var(--border-dim);
-  padding: 16px;
+  padding: 14px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
 }
 
 #sidebar h3 {
   font-family: var(--font-display);
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border-dim);
   padding-bottom: 4px;
@@ -436,32 +436,16 @@ html, body {
   gap: 8px;
 }
 
+/* TOWER CARDS — DISTINCT ARCHETYPE TREATMENTS */
 .tower-card {
   background: var(--bg-card);
   border: 1px solid var(--border-dim);
-  border-radius: var(--radius-card);
-  padding: 10px 12px;
+  border-radius: var(--radius-button);
+  padding: 8px 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
-}
-
-.tower-card:hover {
-  border-color: var(--cyan);
-  background: var(--bg-card-hover);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-.tower-card.active {
-  border-color: #22d3a5;
-  background: rgba(34, 211, 165, 0.1);
-  box-shadow: 0 0 12px rgba(34, 211, 165, 0.2);
-}
-
-.tower-card.disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  box-shadow: none !important;
+  overflow: hidden;
 }
 
 .tower-card-top {
@@ -480,13 +464,14 @@ html, body {
   border-radius: 1px;
   display: inline-block;
   margin-right: 8px;
+  box-shadow: 0 0 6px currentColor;
 }
 
 .tower-desc {
   color: var(--text-muted);
-  font-size: 11px;
-  margin-top: 4px;
-  line-height: 1.4;
+  font-size: 10.5px;
+  margin-top: 3px;
+  line-height: 1.35;
   font-family: var(--font-mono);
 }
 
@@ -494,16 +479,92 @@ html, body {
   color: var(--amber);
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12.5px;
+}
+
+/* Arrow Tower Archetype (Cyan) */
+.tower-card[data-key="arrow"] {
+  border-left: 3px solid #3ea6ff;
+  background: linear-gradient(90deg, rgba(62, 166, 255, 0.08) 0%, rgba(13, 20, 34, 0.7) 100%);
+}
+.tower-card[data-key="arrow"]:hover {
+  border-color: #3ea6ff;
+  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.25);
+}
+.tower-card[data-key="arrow"].active {
+  border-color: #3ea6ff;
+  background: rgba(62, 166, 255, 0.16);
+  box-shadow: 0 0 16px rgba(62, 166, 255, 0.35), inset 0 0 10px rgba(62, 166, 255, 0.15);
+}
+
+/* Cannon Mortar Archetype (Amber/Orange) */
+.tower-card[data-key="cannon"] {
+  border-left: 3px solid #ffb84d;
+  background: linear-gradient(90deg, rgba(255, 184, 77, 0.08) 0%, rgba(13, 20, 34, 0.7) 100%);
+}
+.tower-card[data-key="cannon"]:hover {
+  border-color: #ffb84d;
+  box-shadow: 0 4px 14px rgba(255, 184, 77, 0.25);
+}
+.tower-card[data-key="cannon"].active {
+  border-color: #ffb84d;
+  background: rgba(255, 184, 77, 0.16);
+  box-shadow: 0 0 16px rgba(255, 184, 77, 0.35), inset 0 0 10px rgba(255, 184, 77, 0.15);
+}
+
+/* Cryo Spire Archetype (Ice Blue) */
+.tower-card[data-key="frost"] {
+  border-left: 3px solid #7ee8fa;
+  background: linear-gradient(90deg, rgba(126, 232, 250, 0.08) 0%, rgba(13, 20, 34, 0.7) 100%);
+}
+.tower-card[data-key="frost"]:hover {
+  border-color: #7ee8fa;
+  box-shadow: 0 4px 14px rgba(126, 232, 250, 0.25);
+}
+.tower-card[data-key="frost"].active {
+  border-color: #7ee8fa;
+  background: rgba(126, 232, 250, 0.16);
+  box-shadow: 0 0 16px rgba(126, 232, 250, 0.35), inset 0 0 10px rgba(126, 232, 250, 0.15);
+}
+
+/* Railgun Sniper Archetype (Purple) */
+.tower-card[data-key="sniper"] {
+  border-left: 3px solid #c792ea;
+  background: linear-gradient(90deg, rgba(199, 146, 234, 0.08) 0%, rgba(13, 20, 34, 0.7) 100%);
+}
+.tower-card[data-key="sniper"]:hover {
+  border-color: #c792ea;
+  box-shadow: 0 4px 14px rgba(199, 146, 234, 0.25);
+}
+.tower-card[data-key="sniper"].active {
+  border-color: #c792ea;
+  background: rgba(199, 146, 234, 0.16);
+  box-shadow: 0 0 16px rgba(199, 146, 234, 0.35), inset 0 0 10px rgba(199, 146, 234, 0.15);
+}
+
+/* UNAFFORDABLE / LOCKED STATE (Hatch Texture & Dimmed Alert) */
+.tower-card.disabled {
+  background-image: repeating-linear-gradient(-45deg, rgba(5, 8, 14, 0.85), rgba(5, 8, 14, 0.85) 6px, rgba(20, 30, 48, 0.4) 6px, rgba(20, 30, 48, 0.4) 12px) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  border-left-color: rgba(107, 133, 163, 0.3) !important;
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.tower-card.disabled .tower-cost {
+  color: #ff5252 !important;
 }
 
 /* SELECTION MATRIX PANEL */
 #selection-panel {
-  background: var(--bg-card);
-  border: 1px solid #22d3a5;
-  border-radius: var(--radius-card);
-  padding: 12px;
-  box-shadow: 0 0 14px rgba(34, 211, 165, 0.15);
+  background: rgba(9, 14, 23, 0.95);
+  border: 1px solid var(--border-dim);
+  border-top: 2px solid #22d3a5;
+  border-radius: 0;
+  padding: 10px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
 #selection-panel.hidden { display: none; }
@@ -511,10 +572,11 @@ html, body {
 #sel-info div {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
-  margin: 5px 0;
+  font-size: 11.5px;
+  padding: 3px 0;
   color: var(--text-muted);
   font-family: var(--font-mono);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
 }
 
 #sel-info b {
@@ -525,7 +587,7 @@ html, body {
 .sel-actions {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .sel-actions button {
