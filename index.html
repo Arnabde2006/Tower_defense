@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Battle Tower — Cyber Tower Defense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-icon">⚡</span>
+      <span class="brand-text">BATTLE<span class="highlight">TOWER</span></span>
+    </div>
+    <div class="stats">
+      <div class="stat" id="stat-health"><span class="icon">❤️</span> <span id="val-health">100</span></div>
+      <div class="stat" id="stat-gold"><span class="icon">🪙</span> <span id="val-gold">150</span></div>
+      <div class="stat" id="stat-score"><span class="icon">🏆</span> <span id="val-score">0</span></div>
+      <div class="stat" id="stat-wave"><span class="icon">🌊</span> Wave <span id="val-wave">0</span>/<span id="val-wave-total">50</span></div>
+    </div>
+    <div class="controls">
+      <button id="btn-pause" class="ctrl-btn" title="Pause / Resume">⏸</button>
+      <button id="btn-speed" class="ctrl-btn" title="Game Speed">1x</button>
+      <button id="btn-start-wave" class="ctrl-btn accent" title="Start next wave">▶ Send Wave</button>
+      <button id="btn-restart" class="ctrl-btn danger" title="Restart Run">⟲</button>
+      <button id="btn-stress" class="ctrl-btn warn" title="Trigger Worst-case Stress Test">⚡ Stress Test</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="canvas-wrap">
+      <canvas id="game"></canvas>
+      <div id="fps-hud">
+        <div class="hud-header">PERF MONITOR</div>
+        <div>FPS: <span id="hud-fps" class="hud-val">60</span></div>
+        <div>Frame: <span id="hud-frame" class="hud-val">0.0</span>ms</div>
+        <div>Enemies: <span id="hud-enemies" class="hud-val">0</span></div>
+        <div>Projectiles: <span id="hud-proj" class="hud-val">0</span></div>
+        <div>Towers: <span id="hud-towers" class="hud-val">0</span></div>
+        <div>&gt;33ms: <span id="hud-slow" class="hud-val">0.0</span>%</div>
+      </div>
+      <div id="overlay" class="hidden">
+        <div id="overlay-card">
+          <div class="overlay-icon">🏆</div>
+          <h1 id="overlay-title">Game Over</h1>
+          <p id="overlay-sub"></p>
+          <button id="overlay-restart" class="ctrl-btn accent lg">Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <aside id="sidebar">
+      <section id="tower-shop">
+        <h3>Build Arsenal</h3>
+        <div class="tower-list" id="tower-list"></div>
+      </section>
+      <section id="selection-panel" class="hidden">
+        <h3>Selected Unit</h3>
+        <div id="sel-info"></div>
+        <div class="sel-actions">
+          <button id="btn-upgrade" class="ctrl-btn accent">Upgrade</button>
+          <button id="btn-sell" class="ctrl-btn danger">Sell</button>
+        </div>
+      </section>
+      <section id="legend">
+        <h3>Threat Intelligence</h3>
+        <div id="enemy-legend"></div>
+      </section>
+    </aside>
+  </main>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
