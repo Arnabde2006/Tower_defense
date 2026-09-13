@@ -19,37 +19,64 @@
       </svg>
       <span class="brand-text">TACTICAL<span class="highlight">//DEFENSE</span></span>
     </div>
-    <div class="stats">
-      <div class="stat" id="stat-health">
-        <svg class="hud-icon health-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-        </svg>
-        <span class="stat-label">HULL:</span>
-        <span id="val-health">100</span>
+
+    <div class="stats-panel">
+      <div class="stat stat-hull" id="stat-health">
+        <div class="stat-icon-wrap">
+          <svg class="hud-icon health-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">HULL INTEGRITY</span>
+          <span class="stat-value" id="val-health">100</span>
+        </div>
       </div>
-      <div class="stat" id="stat-gold">
-        <svg class="hud-icon gold-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="8"/>
-          <path d="M12 8v8m-3-5h6"/>
-        </svg>
-        <span class="stat-label">CRED:</span>
-        <span id="val-gold">150</span>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat stat-cred" id="stat-gold">
+        <div class="stat-icon-wrap">
+          <svg class="hud-icon gold-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8"/>
+            <path d="M12 8v8m-3-5h6"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">CREDITS</span>
+          <span class="stat-value" id="val-gold">150</span>
+        </div>
       </div>
-      <div class="stat" id="stat-score">
-        <svg class="hud-icon score-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M12 14.7L16 22H8l4-7.3zM18 4H6v7a6 6 0 0 0 12 0V4z"/>
-        </svg>
-        <span class="stat-label">SCORE:</span>
-        <span id="val-score">0</span>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat stat-score" id="stat-score">
+        <div class="stat-icon-wrap">
+          <svg class="hud-icon score-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M12 14.7L16 22H8l4-7.3zM18 4H6v7a6 6 0 0 0 12 0V4z"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">SCORE</span>
+          <span class="stat-value" id="val-score">0</span>
+        </div>
       </div>
-      <div class="stat" id="stat-wave">
-        <svg class="hud-icon wave-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 12s3-4 6-4 6 4 8 4 4-2 4-2M2 17s3-4 6-4 6 4 8 4 4-2 4-2"/>
-        </svg>
-        <span class="stat-label">SECTOR:</span>
-        <span id="val-wave">0</span>/<span id="val-wave-total">50</span>
+
+      <div class="stat-divider"></div>
+
+      <div class="stat stat-sector" id="stat-wave">
+        <div class="stat-icon-wrap">
+          <svg class="hud-icon wave-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-4 6-4 6 4 8 4 4-2 4-2M2 17s3-4 6-4 6 4 8 4 4-2 4-2"/>
+          </svg>
+        </div>
+        <div class="stat-data">
+          <span class="stat-label">SECTOR</span>
+          <span class="stat-value"><span id="val-wave">0</span><span class="denom">/<span id="val-wave-total">50</span></span></span>
+        </div>
       </div>
     </div>
+
     <div class="controls">
       <button id="btn-pause" class="ctrl-btn" title="Pause / Resume">⏸</button>
       <button id="btn-speed" class="ctrl-btn" title="Game Speed">1x</button>
@@ -71,13 +98,13 @@
     <div id="canvas-wrap">
       <canvas id="game"></canvas>
       <div id="fps-hud">
-        <div class="hud-header">// TELEMETRY LOG</div>
-        <div>SYS_FPS: <span id="hud-fps" class="hud-val">60</span></div>
-        <div>FRAME_DT: <span id="hud-frame" class="hud-val">0.0</span>ms</div>
-        <div>HOSTILES: <span id="hud-enemies" class="hud-val">0</span></div>
-        <div>MUNITIONS: <span id="hud-proj" class="hud-val">0</span></div>
-        <div>BATTERIES: <span id="hud-towers" class="hud-val">0</span></div>
-        <div>LATENCY_SPIKE: <span id="hud-slow" class="hud-val">0.0</span>%</div>
+        <div class="hud-header">// DIAGNOSTIC OVERLAY</div>
+        <div class="hud-row"><span>SYS_FPS:</span><span id="hud-fps" class="hud-val">60</span></div>
+        <div class="hud-row"><span>FRAME_DT:</span><span id="hud-frame" class="hud-val">0.0</span>ms</div>
+        <div class="hud-row"><span>HOSTILES:</span><span id="hud-enemies" class="hud-val">0</span></div>
+        <div class="hud-row"><span>MUNITIONS:</span><span id="hud-proj" class="hud-val">0</span></div>
+        <div class="hud-row"><span>BATTERIES:</span><span id="hud-towers" class="hud-val">0</span></div>
+        <div class="hud-row"><span>SPIKE_RATE:</span><span id="hud-slow" class="hud-val">0.0</span>%</div>
       </div>
       <div id="overlay" class="hidden">
         <div id="overlay-card">
