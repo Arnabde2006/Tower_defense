@@ -355,54 +355,177 @@ html, body {
   color: #ffffff;
 }
 
-/* OVERLAY CONSOLE MODAL */
+/* OVERLAY CONSOLE MODAL — DISTINCT MOMENT TREATMENTS */
 #overlay {
   position: absolute;
   inset: 0;
-  background: rgba(3, 5, 9, 0.88);
+  background: rgba(3, 5, 9, 0.90);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
+  animation: overlayFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: background 0.4s ease;
 }
-#overlay.hidden { display: none; }
+#overlay.hidden {
+  display: none;
+}
+
+#overlay.victory {
+  background: radial-gradient(circle at center, rgba(16, 185, 129, 0.18) 0%, rgba(3, 5, 9, 0.94) 75%);
+}
+
+#overlay.defeat {
+  background: radial-gradient(circle at center, rgba(239, 68, 68, 0.16) 0%, rgba(3, 5, 9, 0.95) 75%);
+}
 
 #overlay-card {
+  position: relative;
   background: var(--bg-panel);
-  border: 1px solid var(--crimson);
+  border: 1px solid var(--border-bright);
   border-radius: var(--radius-card);
-  padding: 36px 48px;
+  padding: 40px 48px;
   text-align: center;
-  box-shadow: 0 0 30px var(--crimson-glow), 0 20px 50px rgba(0, 0, 0, 0.9);
-  max-width: 420px;
+  max-width: 440px;
   width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
+  animation: cardScaleIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.25) forwards;
+  overflow: hidden;
+}
+
+/* Card Accent Light Strip at top */
+#overlay-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--text-muted);
+}
+
+#overlay.victory #overlay-card {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, var(--bg-panel) 40%);
+  box-shadow: 0 0 35px var(--emerald-glow), 0 0 70px rgba(16, 185, 129, 0.12), 0 20px 60px rgba(0, 0, 0, 0.95);
+}
+#overlay.victory #overlay-card::before {
+  background: linear-gradient(90deg, transparent, var(--emerald), transparent);
+  box-shadow: 0 0 10px var(--emerald-glow);
+}
+
+#overlay.defeat #overlay-card {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, var(--bg-panel) 40%);
+  box-shadow: 0 0 35px var(--crimson-glow), 0 0 70px rgba(239, 68, 68, 0.12), 0 20px 60px rgba(0, 0, 0, 0.95);
+}
+#overlay.defeat #overlay-card::before {
+  background: linear-gradient(90deg, transparent, var(--crimson), transparent);
+  box-shadow: 0 0 10px var(--crimson-glow);
 }
 
 .overlay-icon-wrap {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+#overlay.victory .overlay-icon-wrap {
+  color: var(--emerald);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+  filter: drop-shadow(0 0 14px var(--emerald-glow));
+}
+
+#overlay.defeat .overlay-icon-wrap {
   color: var(--crimson);
-  filter: drop-shadow(0 0 10px var(--crimson-glow));
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  filter: drop-shadow(0 0 14px var(--crimson-glow));
 }
 
 #overlay-title {
   font-family: var(--font-display);
   margin: 0 0 10px;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: 2px;
   color: #ffffff;
+  text-transform: uppercase;
+}
+
+#overlay.victory #overlay-title {
+  text-shadow: 0 0 16px var(--emerald-glow);
+}
+
+#overlay.defeat #overlay-title {
+  text-shadow: 0 0 16px var(--crimson-glow);
 }
 
 #overlay-sub {
   color: var(--text-muted);
-  margin-bottom: 24px;
-  font-size: 14px;
-  line-height: 1.5;
+  margin-bottom: 28px;
+  font-size: 13px;
+  line-height: 1.55;
+  font-family: var(--font-mono);
+}
+
+#overlay-restart {
+  width: 100%;
+  justify-content: center;
+}
+
+#overlay.victory #overlay-restart {
+  background: linear-gradient(135deg, var(--emerald) 0%, #059669 100%);
+  border-color: var(--emerald);
+  color: #022c22;
+  font-weight: 700;
+  box-shadow: 0 0 16px var(--emerald-glow);
+}
+#overlay.victory #overlay-restart:hover {
+  background: linear-gradient(135deg, #34d399 0%, var(--emerald) 100%);
+  box-shadow: 0 0 24px var(--emerald-glow);
+}
+
+#overlay.defeat #overlay-restart {
+  background: linear-gradient(135deg, var(--crimson) 0%, #dc2626 100%);
+  border-color: var(--crimson);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0 16px var(--crimson-glow);
+}
+#overlay.defeat #overlay-restart:hover {
+  background: linear-gradient(135deg, #f87171 0%, var(--crimson) 100%);
+  box-shadow: 0 0 24px var(--crimson-glow);
 }
 
 .ctrl-btn.lg {
-  padding: 10px 24px;
-  font-size: 14px;
+  padding: 12px 24px;
+  font-size: 13px;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cardScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* SIDEBAR COMMAND PANEL */

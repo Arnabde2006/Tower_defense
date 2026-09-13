@@ -1256,9 +1256,15 @@ function tryPlaceTower(tile) {
 function showOverlay(title, sub) {
   el('overlay-title').textContent = title;
   el('overlay-sub').textContent = sub;
+  const isVic = victory || title.toLowerCase().includes('victory');
+  el('overlay').classList.toggle('victory', isVic);
+  el('overlay').classList.toggle('defeat', !isVic);
   el('overlay').classList.remove('hidden');
 }
-function hideOverlay() { el('overlay').classList.add('hidden'); }
+function hideOverlay() {
+  el('overlay').classList.add('hidden');
+  el('overlay').classList.remove('victory', 'defeat');
+}
 
 function updateWaveButtonState() {
   const btn = el('btn-start-wave');
