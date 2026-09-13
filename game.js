@@ -265,6 +265,7 @@ function makeEnemyPool(n) {
     hp: new Float32Array(n), maxHp: new Float32Array(n),
     speed: new Float32Array(n), baseSpeed: new Float32Array(n),
     slowTimer: new Float32Array(n),
+    hitFlashTimer: new Float32Array(n),
     freeList: (() => { const a = new Array(n); for (let i = 0; i < n; i++) a[i] = n - 1 - i; return a; })(),
     count: n
   };
@@ -288,6 +289,7 @@ function spawnEnemy(typeIdx, distOffset) {
   EP.baseSpeed[i] = def.speed;
   EP.speed[i] = def.speed;
   EP.slowTimer[i] = 0;
+  EP.hitFlashTimer[i] = 0;
   return i;
 }
 function killEnemy(i, reachedBase) {
@@ -581,6 +583,9 @@ function simTick(dt) {
       EP.slowTimer[i] -= dt;
       if (EP.slowTimer[i] <= 0) EP.speed[i] = EP.baseSpeed[i];
     }
+    if (EP.hitFlashTimer[i] > 0) {
+      EP.hitFlashTimer[i] -= dt;
+    }
     EP.dist[i] += EP.speed[i] * dt;
     if (EP.dist[i] >= TOTAL_PATH_LEN) {
       killEnemy(i, true);
@@ -712,6 +717,7 @@ function applyDamage(idx, dmg, slow) {
   const def = ENEMY_TYPES[ENEMY_KEYS[EP.type[idx]]];
   const effective = Math.max(1, dmg - def.armor);
   EP.hp[idx] -= effective;
+  EP.hitFlashTimer[idx] = 0.12; // 120ms hit flash + pulse
   if (slow > 0) {
     EP.speed[idx] = EP.baseSpeed[idx] * (1 - slow);
     EP.slowTimer[idx] = 1.2;
@@ -840,15 +846,24 @@ function render() {
   }
   ctx.lineWidth = 1;
 
-  // Projectiles
+  // Projectiles (two-tone directional energy slugs)
   for (let i = 0; i < MAX_PROJECTILES; i++) {
     if (!PP.active[i]) continue;
     const x = PP.x[i], y = PP.y[i];
     if (x < -10 || x > CANVAS_W + 10 || y < -10 || y > CANVAS_H + 10) continue;
+    const ang = Math.atan2(PP.vy[i], PP.vx[i]);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
     ctx.fillStyle = PP.color[i];
     ctx.beginPath();
-    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 6, 2.5, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(2, 0, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   // Particles
@@ -881,12 +896,18 @@ function drawTower(t) {
   ctx.save();
   ctx.translate(t.x, t.y);
 
-  // Metallic octagon base plate
-  ctx.fillStyle = '#162238';
-  ctx.strokeStyle = '#2d3f61';
+  // Soft drop shadow ground blob under tower
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.beginPath();
+  ctx.ellipse(0, 6, CELL * 0.44, CELL * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Metallic octagon base plate with two-tone shading
+  const r = CELL / 2 - 3;
+  ctx.fillStyle = '#141f33';
+  ctx.strokeStyle = '#34486d';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
-  const r = CELL / 2 - 3;
   for (let a = 0; a < 8; a++) {
     const ang = (a * Math.PI) / 4 + Math.PI / 8;
     const bx = Math.cos(ang) * r, by = Math.sin(ang) * r;
@@ -894,6 +915,12 @@ function drawTower(t) {
   }
   ctx.closePath();
   ctx.fill(); ctx.stroke();
+
+  // Base top-half two-tone highlight
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.beginPath();
+  ctx.rect(-r + 2, -r + 2, (r - 2) * 2, r - 2);
+  ctx.fill();
 
   // Corner rivets
   ctx.fillStyle = '#42577d';
@@ -915,50 +942,71 @@ function drawTower(t) {
   ctx.rotate(angle);
 
   if (t.typeKey === 'arrow') {
-    // Dual plasma ballista turret
-    ctx.fillStyle = '#1c2d4a';
+    // Dual plasma ballista turret (two-tone cyan)
+    ctx.fillStyle = '#162845';
     ctx.fillRect(-8, -9, 16, 18);
-    // Dual barrels
+    // Upper & Lower Barrels with shadow edges
+    ctx.fillStyle = '#1d629a';
+    ctx.fillRect(0, -7, 14, 5);
+    ctx.fillRect(0, 1, 14, 5);
     ctx.fillStyle = '#3ea6ff';
-    ctx.fillRect(0, -6, 14, 4);
-    ctx.fillRect(0, 2, 14, 4);
-    // Energy core strip
+    ctx.fillRect(0, -6, 14, 3);
+    ctx.fillRect(0, 2, 14, 3);
+    // Glowing plasma tips
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(12, -6, 3, 3);
+    ctx.fillRect(12, 2, 3, 3);
+    // Core strip
     ctx.fillStyle = '#8fd0ff';
     ctx.fillRect(-4, -2, 6, 4);
   } else if (t.typeKey === 'cannon') {
-    // Heavy cannon mortar
-    ctx.fillStyle = '#2d2822';
+    // Heavy cannon mortar (two-tone amber/bronze)
+    ctx.fillStyle = '#26221c';
     ctx.fillRect(-9, -10, 18, 20);
-    // Heavy dark barrel
-    ctx.fillStyle = '#4d463d';
-    ctx.fillRect(-2, -5, 16, 10);
+    // Heavy dark barrel with top highlight
+    ctx.fillStyle = '#2d2822';
+    ctx.fillRect(-2, -6, 16, 12);
+    ctx.fillStyle = '#5c5347';
+    ctx.fillRect(-2, -5, 16, 6);
+    // Muzzle ring & glowing core
     ctx.fillStyle = '#ffb84d';
     ctx.fillRect(11, -6, 3, 12);
-    // Orange glowing core
     ctx.fillStyle = '#ff9f1c';
     ctx.beginPath(); ctx.arc(-2, 0, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(-3, -1, 1.5, 0, Math.PI * 2); ctx.fill();
   } else if (t.typeKey === 'frost') {
-    // Cryo spire gem (floating rotation)
+    // Cryo spire gem (two-tone ice blue with floating rotation)
     ctx.fillStyle = 'rgba(126, 232, 250, 0.2)';
     ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+    // Dark pedestal shadow
+    ctx.fillStyle = '#1c505c';
+    ctx.beginPath();
+    ctx.moveTo(9, 0); ctx.lineTo(0, 11); ctx.lineTo(-9, 0);
+    ctx.closePath(); ctx.fill();
+    // Bright top facet
     ctx.fillStyle = '#7ee8fa';
     ctx.beginPath();
-    ctx.moveTo(8, 0); ctx.lineTo(0, -10); ctx.lineTo(-8, 0); ctx.lineTo(0, 10);
+    ctx.moveTo(9, 0); ctx.lineTo(0, -11); ctx.lineTo(-9, 0);
     ctx.closePath(); ctx.fill();
+    // Diamond core facet
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.moveTo(4, 0); ctx.lineTo(0, -5); ctx.lineTo(-4, 0); ctx.lineTo(0, 5);
     ctx.closePath(); ctx.fill();
   } else if (t.typeKey === 'sniper') {
-    // Railgun sniper
-    ctx.fillStyle = '#261b36';
+    // Railgun sniper (two-tone electromagnetic purple)
+    ctx.fillStyle = '#1f152d';
     ctx.beginPath();
     ctx.moveTo(8, 0); ctx.lineTo(-8, -9); ctx.lineTo(-8, 9);
     ctx.closePath(); ctx.fill();
-    // Double magnetic rail barrels
+    // Dual magnetic rail barrels with highlight
+    ctx.fillStyle = '#502a6c';
+    ctx.fillRect(2, -5, 18, 3.5);
+    ctx.fillRect(2, 1.5, 18, 3.5);
     ctx.fillStyle = '#c792ea';
-    ctx.fillRect(2, -4, 18, 2.5);
-    ctx.fillRect(2, 1.5, 18, 2.5);
+    ctx.fillRect(2, -4, 18, 2);
+    ctx.fillRect(2, 2, 18, 2);
     // Purple beam core
     ctx.fillStyle = '#e6c9ff';
     ctx.fillRect(-4, -1.5, 8, 3);
@@ -968,7 +1016,7 @@ function drawTower(t) {
 
   // Railgun Laser Sight Line pointing toward target
   if (t.typeKey === 'sniper' && t.targetEnemy !== -1 && EP.active[t.targetEnemy]) {
-    ctx.strokeStyle = 'rgba(199, 146, 234, 0.25)';
+    ctx.strokeStyle = 'rgba(199, 146, 234, 0.3)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(t.x, t.y);
@@ -981,59 +1029,79 @@ function drawEnemy(i) {
   const g = EP.type[i];
   const x = EP.x[i], y = EP.y[i];
   const angle = EP.angle[i] || 0;
+  const isHitFlash = EP.hitFlashTimer[i] > 0;
 
   ctx.save();
   ctx.translate(x, y);
 
-  // Drop shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+  // Soft drop shadow / ground blob under enemy
+  const r = g === 4 ? 14 : (g === 2 ? 10 : 7);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
   ctx.beginPath();
-  ctx.ellipse(2, 4, 8, 4, 0, 0, Math.PI * 2);
+  ctx.ellipse(2, 5, r * 1.15, r * 0.55, 0, 0, Math.PI * 2);
   ctx.fill();
+
+  // Scale pulse on hit damage
+  if (isHitFlash) {
+    ctx.scale(1.18, 1.18);
+  }
 
   ctx.rotate(angle);
 
   if (g === 0) {
-    // GRUNT (Battle Bot)
-    ctx.fillStyle = '#3a4454';
+    // GRUNT (Battle Bot - two-tone red & steel chassis)
+    ctx.fillStyle = '#2a3240';
     ctx.fillRect(-6, -6, 12, 12);
-    ctx.fillStyle = '#ff8080';
+    ctx.fillStyle = '#b84d4d';
     ctx.fillRect(-4, -8, 8, 3);
     ctx.fillRect(-4, 5, 8, 3);
+    ctx.fillStyle = '#ff8080';
+    ctx.fillRect(-4, -8, 8, 1.5);
+    ctx.fillRect(-4, 5, 8, 1.5);
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(2, -2, 4, 4);
   } else if (g === 1) {
-    // RUNNER (Hover Speeder)
-    ctx.fillStyle = '#ffe066';
+    // RUNNER (Hover Speeder - two-tone yellow)
+    ctx.fillStyle = '#c29b1d';
     ctx.beginPath();
     ctx.moveTo(9, 0); ctx.lineTo(-7, -6); ctx.lineTo(-4, 0); ctx.lineTo(-7, 6);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffe066';
+    ctx.beginPath();
+    ctx.moveTo(9, 0); ctx.lineTo(-7, -3); ctx.lineTo(-4, 0); ctx.lineTo(-7, 3);
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#ff9f1c';
     ctx.beginPath(); ctx.arc(-7, 0, 3, 0, Math.PI * 2); ctx.fill();
   } else if (g === 2) {
-    // TANK (Armored Tank)
-    ctx.fillStyle = '#222834';
+    // TANK (Armored Tank - two-tone purple armor)
+    ctx.fillStyle = '#191e28';
     ctx.fillRect(-10, -10, 20, 4);
     ctx.fillRect(-10, 6, 20, 4);
-    ctx.fillStyle = '#a78bfa';
+    ctx.fillStyle = '#6c50c4';
     ctx.fillRect(-8, -7, 16, 14);
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillRect(-8, -7, 16, 7);
     ctx.fillStyle = '#6d28d9';
     ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ddd6fe';
     ctx.fillRect(0, -2, 10, 4);
   } else if (g === 3) {
-    // SWARM (Cryo Shard)
-    ctx.fillStyle = '#66ffcc';
+    // SWARM (Cryo Shard - two-tone mint crystal)
+    ctx.fillStyle = '#269973';
     ctx.beginPath();
     ctx.moveTo(7, 0); ctx.lineTo(0, -6); ctx.lineTo(-7, 0); ctx.lineTo(0, 6);
     ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#66ffcc';
+    ctx.beginPath();
+    ctx.moveTo(7, 0); ctx.lineTo(0, -3); ctx.lineTo(-7, 0); ctx.lineTo(0, 3);
+    ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(3, 0); ctx.lineTo(0, -3); ctx.lineTo(-3, 0); ctx.lineTo(0, 3);
+    ctx.moveTo(3, 0); ctx.lineTo(0, -2); ctx.lineTo(-3, 0); ctx.lineTo(0, 2);
     ctx.closePath(); ctx.fill();
   } else if (g === 4) {
-    // BOSS (Mech Dreadnought)
-    ctx.fillStyle = '#1e293b';
+    // BOSS (Mech Dreadnought - two-tone red & slate)
+    ctx.fillStyle = '#151d2a';
     ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#ff4d6d';
     ctx.lineWidth = 3;
@@ -1042,6 +1110,14 @@ function drawEnemy(i) {
     ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.beginPath(); ctx.arc(2, -2, 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Hit-flash white overlay when damaged
+  if (isHitFlash) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 2, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   ctx.restore();
