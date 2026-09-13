@@ -1260,19 +1260,41 @@ function refreshSelectionPanel() {
   const upBtn = el('btn-upgrade');
   upBtn.disabled = maxLevel || gold < upgradeCost;
   upBtn.textContent = maxLevel ? 'Max Level' : `Upgrade (${upgradeCost}g)`;
-  upBtn.onclick = () => {
-    if (maxLevel || gold < upgradeCost) return;
-    gold -= upgradeCost;
-    t.level++;
-    refreshSelectionPanel();
-  };
-  el('btn-sell').onclick = () => {
-    gold += Math.round(towerSpent(t) * SELL_REFUND);
-    towers = towers.filter(tw => tw.id !== t.id);
-    selectedTowerId = null;
-    refreshSelectionPanel();
-  };
+  upBtn.onclick = upgradeSelectedTower;
+  el('btn-sell').onclick = sellSelectedTower;
 }
+
+function upgradeSelectedTower() {
+  if (!selectedTowerId) return;
+  const t = towers.find(tw => tw.id === selectedTowerId);
+  if (!t) return;
+  const def = TOWER_TYPES[t.typeKey];
+  const maxLevel = t.level >= def.levels.length - 1;
+  if (maxLevel) return;
+  const upgradeCost = Math.round(def.cost * UPGRADE_COST_MULT * (t.level + 1) + def.cost * 0.5);
+  if (gold < upgradeCost) return;
+
+  gold -= upgradeCost;
+  t.level++;
+  refreshSelectionPanel();
+  refreshShopSelection();
+  updateHud();
+}
+
+function sellSelectedTower() {
+  if (!selectedTowerId) return;
+  const t = towers.find(tw => tw.id === selectedTowerId);
+  if (!t) return;
+
+  const refund = Math.round(towerSpent(t) * SELL_REFUND);
+  gold += refund;
+  towers = towers.filter(tw => tw.id !== t.id);
+  selectedTowerId = null;
+  refreshSelectionPanel();
+  refreshShopSelection();
+  updateHud();
+}
+
 function towerSpent(t) {
   const def = TOWER_TYPES[t.typeKey];
   let spent = def.cost;
@@ -1295,13 +1317,20 @@ canvas.addEventListener('mouseleave', () => { hoverTile = null; });
 
 canvas.addEventListener('click', e => {
   const tile = screenToTile(e.clientX, e.clientY);
+  const existing = towers.find(t => t.gx === tile.gx && t.gy === tile.gy);
+
   if (selectedBuildType) {
+    if (existing) {
+      selectedBuildType = null;
+      selectedTowerId = existing.id;
+      refreshShopSelection();
+      refreshSelectionPanel();
+      return;
+    }
     tryPlaceTower(tile);
     return;
   }
-  // select existing tower
-  const found = towers.find(t => t.gx === tile.gx && t.gy === tile.gy);
-  selectedTowerId = found ? found.id : null;
+  selectedTowerId = existing ? existing.id : null;
   refreshSelectionPanel();
 });
 
@@ -1319,6 +1348,7 @@ function tryPlaceTower(tile) {
     cooldown: 0, targetEnemy: -1
   });
   refreshShopSelection();
+  updateHud();
 }
 
 function showOverlay(title, sub) {
