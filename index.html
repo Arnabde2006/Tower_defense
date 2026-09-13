@@ -3,31 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Battle Tower — Cyber Tower Defense</title>
+<title>Tactical Defense — Command Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
   <header id="topbar">
     <div class="brand">
-      <span class="brand-icon">⚡</span>
-      <span class="brand-text">BATTLE<span class="highlight">TOWER</span></span>
+      <svg class="brand-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v3m0 12v3M3 12h3m12 0h3"/>
+      </svg>
+      <span class="brand-text">TACTICAL<span class="highlight">//DEFENSE</span></span>
     </div>
     <div class="stats">
-      <div class="stat" id="stat-health"><span class="icon">❤️</span> <span id="val-health">100</span></div>
-      <div class="stat" id="stat-gold"><span class="icon">🪙</span> <span id="val-gold">150</span></div>
-      <div class="stat" id="stat-score"><span class="icon">🏆</span> <span id="val-score">0</span></div>
-      <div class="stat" id="stat-wave"><span class="icon">🌊</span> Wave <span id="val-wave">0</span>/<span id="val-wave-total">50</span></div>
+      <div class="stat" id="stat-health">
+        <svg class="hud-icon health-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        </svg>
+        <span class="stat-label">HULL:</span>
+        <span id="val-health">100</span>
+      </div>
+      <div class="stat" id="stat-gold">
+        <svg class="hud-icon gold-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8"/>
+          <path d="M12 8v8m-3-5h6"/>
+        </svg>
+        <span class="stat-label">CRED:</span>
+        <span id="val-gold">150</span>
+      </div>
+      <div class="stat" id="stat-score">
+        <svg class="hud-icon score-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M12 14.7L16 22H8l4-7.3zM18 4H6v7a6 6 0 0 0 12 0V4z"/>
+        </svg>
+        <span class="stat-label">SCORE:</span>
+        <span id="val-score">0</span>
+      </div>
+      <div class="stat" id="stat-wave">
+        <svg class="hud-icon wave-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3-4 6-4 6 4 8 4 4-2 4-2M2 17s3-4 6-4 6 4 8 4 4-2 4-2"/>
+        </svg>
+        <span class="stat-label">SECTOR:</span>
+        <span id="val-wave">0</span>/<span id="val-wave-total">50</span>
+      </div>
     </div>
     <div class="controls">
       <button id="btn-pause" class="ctrl-btn" title="Pause / Resume">⏸</button>
       <button id="btn-speed" class="ctrl-btn" title="Game Speed">1x</button>
-      <button id="btn-start-wave" class="ctrl-btn accent" title="Start next wave">▶ Send Wave</button>
-      <button id="btn-restart" class="ctrl-btn danger" title="Restart Run">⟲</button>
-      <button id="btn-stress" class="ctrl-btn warn" title="Trigger Worst-case Stress Test">⚡ Stress Test</button>
+      <button id="btn-start-wave" class="ctrl-btn accent" title="Start Next Wave">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>SEND WAVE</span>
+      </button>
+      <button id="btn-restart" class="ctrl-btn danger" title="Abort & Restart">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <button id="btn-stress" class="ctrl-btn warn" title="Trigger Overdrive Test">
+        <svg class="btn-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>OVERDRIVE</span>
+      </button>
     </div>
   </header>
 
@@ -35,39 +71,43 @@
     <div id="canvas-wrap">
       <canvas id="game"></canvas>
       <div id="fps-hud">
-        <div class="hud-header">PERF MONITOR</div>
-        <div>FPS: <span id="hud-fps" class="hud-val">60</span></div>
-        <div>Frame: <span id="hud-frame" class="hud-val">0.0</span>ms</div>
-        <div>Enemies: <span id="hud-enemies" class="hud-val">0</span></div>
-        <div>Projectiles: <span id="hud-proj" class="hud-val">0</span></div>
-        <div>Towers: <span id="hud-towers" class="hud-val">0</span></div>
-        <div>&gt;33ms: <span id="hud-slow" class="hud-val">0.0</span>%</div>
+        <div class="hud-header">// TELEMETRY LOG</div>
+        <div>SYS_FPS: <span id="hud-fps" class="hud-val">60</span></div>
+        <div>FRAME_DT: <span id="hud-frame" class="hud-val">0.0</span>ms</div>
+        <div>HOSTILES: <span id="hud-enemies" class="hud-val">0</span></div>
+        <div>MUNITIONS: <span id="hud-proj" class="hud-val">0</span></div>
+        <div>BATTERIES: <span id="hud-towers" class="hud-val">0</span></div>
+        <div>LATENCY_SPIKE: <span id="hud-slow" class="hud-val">0.0</span>%</div>
       </div>
       <div id="overlay" class="hidden">
         <div id="overlay-card">
-          <div class="overlay-icon">🏆</div>
-          <h1 id="overlay-title">Game Over</h1>
+          <div class="overlay-icon-wrap">
+            <svg class="overlay-svg-icon" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M12 14.7L16 22H8l4-7.3zM18 4H6v7a6 6 0 0 0 12 0V4z"/>
+            </svg>
+          </div>
+          <h1 id="overlay-title">SYSTEM DEFEATED</h1>
           <p id="overlay-sub"></p>
-          <button id="overlay-restart" class="ctrl-btn accent lg">Play Again</button>
+          <button id="overlay-restart" class="ctrl-btn accent lg">REBOOT CONSOLE</button>
         </div>
       </div>
     </div>
 
     <aside id="sidebar">
       <section id="tower-shop">
-        <h3>Build Arsenal</h3>
+        <h3>// DEFENSE ARSENAL</h3>
         <div class="tower-list" id="tower-list"></div>
       </section>
       <section id="selection-panel" class="hidden">
-        <h3>Selected Unit</h3>
+        <h3>// TARGET MATRIX</h3>
         <div id="sel-info"></div>
         <div class="sel-actions">
-          <button id="btn-upgrade" class="ctrl-btn accent">Upgrade</button>
-          <button id="btn-sell" class="ctrl-btn danger">Sell</button>
+          <button id="btn-upgrade" class="ctrl-btn accent">UPGRADE</button>
+          <button id="btn-sell" class="ctrl-btn danger">DISMANTLE</button>
         </div>
       </section>
       <section id="legend">
-        <h3>Threat Intelligence</h3>
+        <h3>// THREAT DATABASE</h3>
         <div id="enemy-legend"></div>
       </section>
     </aside>
