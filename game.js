@@ -26,26 +26,74 @@ canvas.height = CANVAS_H;
 const ctx = canvas.getContext('2d', { alpha: false });
 
 /* ---------------------------------------------------------------------
-   1. PATH DEFINITION (grid waypoints -> pixel centers)
+   1. PATH DEFINITION & PROCEDURAL GENERATION
    --------------------------------------------------------------------- */
-// A winding path from left edge to a base near the right side.
-const WAYPOINTS_GRID = [
-  [-1, 2], [3, 2], [3, 5], [7, 5], [7, 1], [11, 1], [11, 8],
-  [5, 8], [5, 11], [14, 11], [14, 4], [18, 4], [18, 9], [22, 9]
-];
-const PATH = WAYPOINTS_GRID.map(([gx, gy]) => ({
-  x: gx * CELL + CELL / 2,
-  y: gy * CELL + CELL / 2
-}));
-
-// Precompute cumulative segment lengths for fast distance->position lookup.
-const SEG_LEN = [];
+let WAYPOINTS_GRID = [];
+let PATH = [];
+let SEG_LEN = [];
 let TOTAL_PATH_LEN = 0;
-for (let i = 0; i < PATH.length - 1; i++) {
-  const dx = PATH[i + 1].x - PATH[i].x, dy = PATH[i + 1].y - PATH[i].y;
-  const len = Math.hypot(dx, dy);
-  SEG_LEN.push(len);
-  TOTAL_PATH_LEN += len;
+const blockedTiles = new Set();
+function tileKey(gx, gy) { return gx + ',' + gy; }
+
+/** Procedurally builds a WAYPOINTS_GRID array from gx=-1 to gx=GRID_W */
+function generateRandomPath() {
+  const MIN_GRID_LEN = 48; // minimum path length in grid cells for interesting play
+  let waypoints = [];
+  let valid = false;
+
+  while (!valid) {
+    waypoints = [];
+    let currY = Math.floor(Math.random() * (GRID_H - 4)) + 2; // e.g. 2 to 11
+    let currX = -1;
+    waypoints.push([currX, currY]);
+
+    // First horizontal segment into grid (gx = 2 to 4)
+    let firstX = Math.floor(Math.random() * 3) + 2;
+    waypoints.push([firstX, currY]);
+    currX = firstX;
+
+    // Advance rightward across the grid with alternating vertical swings
+    while (currX < GRID_W - 3) {
+      // Pick nextY with a minimum vertical distance from currY
+      let nextY;
+      let attempts = 0;
+      do {
+        nextY = Math.floor(Math.random() * (GRID_H - 2)) + 1; // 1 to 12
+        attempts++;
+      } while (Math.abs(nextY - currY) < 3 && attempts < 30);
+
+      waypoints.push([currX, nextY]);
+      currY = nextY;
+
+      // Horizontal move rightward (advance 2 to 4 cells)
+      let dx = Math.floor(Math.random() * 3) + 2; // 2, 3, or 4
+      let nextX = Math.min(GRID_W - 1, currX + dx);
+      waypoints.push([nextX, currY]);
+      currX = nextX;
+    }
+
+    // Final move to right edge (gx = GRID_W)
+    let finalY = Math.floor(Math.random() * (GRID_H - 2)) + 1;
+    if (Math.abs(finalY - currY) >= 2) {
+      waypoints.push([currX, finalY]);
+      currY = finalY;
+    }
+    waypoints.push([GRID_W, currY]);
+
+    // Calculate total Manhattan distance (grid cells)
+    let totalGridLen = 0;
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const [x1, y1] = waypoints[i];
+      const [x2, y2] = waypoints[i + 1];
+      totalGridLen += Math.abs(x2 - x1) + Math.abs(y2 - y1);
+    }
+
+    if (totalGridLen >= MIN_GRID_LEN) {
+      valid = true;
+    }
+  }
+
+  return waypoints;
 }
 
 /** Given distance traveled along the path, return {x,y,angle}. */
@@ -69,11 +117,9 @@ function pointAtDistance(dist) {
   return { x: last.x, y: last.y, angle: 0 };
 }
 
-// Mark tiles the path occupies as unbuildable (thick corridor: path tile +
-// its neighbor toward each segment direction, approximated by radius check).
-const blockedTiles = new Set();
-function tileKey(gx, gy) { return gx + ',' + gy; }
-(function markPathTiles() {
+/** Mark tiles occupied by the path corridor as unbuildable */
+function markPathTiles() {
+  blockedTiles.clear();
   const samples = Math.ceil(TOTAL_PATH_LEN / 8);
   for (let s = 0; s <= samples; s++) {
     const p = pointAtDistance((s / samples) * TOTAL_PATH_LEN);
@@ -84,14 +130,15 @@ function tileKey(gx, gy) { return gx + ',' + gy; }
         if (Math.hypot(dx, dy) <= 1) blockedTiles.add(tileKey(nx, ny));
       }
   }
-})();
+}
 
 /* ---------------------------------------------------------------------
-   2. STATIC BACKGROUND (pre-rendered once to an offscreen canvas)
+   2. STATIC BACKGROUND (pre-rendered offscreen canvas)
    --------------------------------------------------------------------- */
 const bgCanvas = document.createElement('canvas');
 bgCanvas.width = CANVAS_W; bgCanvas.height = CANVAS_H;
-(function renderBackground() {
+
+function renderBackground() {
   const b = bgCanvas.getContext('2d');
   
   // Cyberpunk base grid fill
@@ -192,7 +239,28 @@ bgCanvas.width = CANVAS_W; bgCanvas.height = CANVAS_H;
   b.setLineDash([4, 4]);
   b.beginPath(); b.arc(spawn.x, spawn.y, CELL * 0.4, 0, Math.PI * 2); b.stroke();
   b.setLineDash([]);
-})();
+}
+
+/** Rebuild path, segment metrics, blocked tiles set, and background canvas */
+function rebuildPath() {
+  WAYPOINTS_GRID = generateRandomPath();
+  PATH = WAYPOINTS_GRID.map(([gx, gy]) => ({
+    x: gx * CELL + CELL / 2,
+    y: gy * CELL + CELL / 2
+  }));
+
+  SEG_LEN = [];
+  TOTAL_PATH_LEN = 0;
+  for (let i = 0; i < PATH.length - 1; i++) {
+    const dx = PATH[i + 1].x - PATH[i].x, dy = PATH[i + 1].y - PATH[i].y;
+    const len = Math.hypot(dx, dy);
+    SEG_LEN.push(len);
+    TOTAL_PATH_LEN += len;
+  }
+
+  markPathTiles();
+  renderBackground();
+}
 
 /* ---------------------------------------------------------------------
    3. TOWER & ENEMY DEFINITIONS
@@ -1306,6 +1374,7 @@ el('btn-stress').addEventListener('click', () => {
 });
 
 function resetGame() {
+  rebuildPath();
   // clear pools
   for (let i = 0; i < MAX_ENEMIES; i++) EP.active[i] = 0;
   EP.freeList = (() => { const a = new Array(MAX_ENEMIES); for (let i = 0; i < MAX_ENEMIES; i++) a[i] = MAX_ENEMIES - 1 - i; return a; })();
@@ -1333,6 +1402,7 @@ function resetGame() {
 /* ---------------------------------------------------------------------
    13. BOOT
    --------------------------------------------------------------------- */
+rebuildPath();
 buildTowerShop();
 buildEnemyLegend();
 updateWaveButtonState();
